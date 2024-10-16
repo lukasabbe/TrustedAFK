@@ -28,6 +28,8 @@ dependencies {
     apiModules.forEach {
         modImplementation(fabricApi.module(it, project.fabric_version))
     }
+
+    include modImplementation("org.yaml:snakeyaml:${project.ymal_snake}")
 }
 
 processResources {

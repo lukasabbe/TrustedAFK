@@ -20,11 +20,13 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
 
     private final List<PlayerObj> PLAYERS = new ArrayList<>();
     private int tick_counter = 0;
+    public static final Config CONFIG = new Config();
 
     private boolean create_team = true;
 
     @Override
     public void onInitialize() {
+        CONFIG.loadConfig();
         ServerTickEvents.END_SERVER_TICK.register(this);
         ServerPlayConnectionEvents.JOIN.register(this);
         ServerPlayConnectionEvents.DISCONNECT.register(this);
@@ -48,7 +50,7 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
     @Override
     public void onEndTick(MinecraftServer minecraftServer) {
         tick_counter++;
-        if(tick_counter >= 20) return;
+        if(tick_counter < 20) return;
         tick_counter = 0;
         if(create_team){
             if(minecraftServer.getScoreboard().getTeam("trusted_afk") == null)
@@ -62,8 +64,8 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
             if(optionalPlayer.isEmpty()) return;
             PlayerObj playerObj = optionalPlayer.get();
             if(playerObj.last_pos != null && playerObj.last_pos.equals(player.getPos())){
-                playerObj.ticksAfk++;
-                if(playerObj.ticksAfk > 20*10 && !playerObj.isAfk){
+                playerObj.ticksAfk+=20;
+                if(playerObj.ticksAfk > 20*60* CONFIG.afkTime && !playerObj.isAfk){
                     toggleAfk(player,playerObj);
                 }
 
