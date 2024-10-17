@@ -65,7 +65,7 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
             PlayerObj playerObj = optionalPlayer.get();
             if(playerObj.last_pos != null && playerObj.last_pos.equals(player.getPos())){
                 playerObj.ticksAfk+=20;
-                if(playerObj.ticksAfk > 20*60* CONFIG.afkTime && !playerObj.isAfk){
+                if(playerObj.ticksAfk > 20 * 60 * CONFIG.afkTime && !playerObj.isAfk){
                     toggleAfk(player,playerObj);
                 }
 
@@ -81,9 +81,13 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
     public void toggleAfk(ServerPlayerEntity player, PlayerObj playerObj){
         playerObj.isAfk = !playerObj.isAfk;
         if(playerObj.isAfk){
+            if(player.getScoreboardTeam() != null)
+                playerObj.lastTeam = player.getScoreboardTeam().getName();
             player.getScoreboard().addScoreHolderToTeam(player.getNameForScoreboard(),player.getScoreboard().getTeam("trusted_afk"));
         }else{
             player.getScoreboard().clearTeam(player.getNameForScoreboard());
+            if(playerObj.lastTeam != null)
+                player.getScoreboard().addScoreHolderToTeam(player.getNameForScoreboard(),player.getScoreboard().getTeam(playerObj.lastTeam));
         }
     }
 

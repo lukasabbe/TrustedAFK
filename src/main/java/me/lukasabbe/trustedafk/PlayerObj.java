@@ -9,6 +9,7 @@ public class PlayerObj {
     public int ticksAfk;
     public Vec3d last_pos;
     public boolean isAfk;
+    public String lastTeam = null;
 
     public PlayerObj(UUID playerUUid) {
         this.playerUUid = playerUUid;
