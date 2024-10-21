@@ -7,7 +7,8 @@ import java.util.UUID;
 public class PlayerObj {
     public UUID playerUUid;
     public int ticksAfk;
-    public Vec3d last_pos;
+    public Vec3d lastPos;
+    public Vec3d lastRot;
     public boolean isAfk;
     public String lastTeam = null;
 
