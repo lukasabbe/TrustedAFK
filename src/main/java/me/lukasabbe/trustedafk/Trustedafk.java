@@ -66,7 +66,7 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
             PlayerObj playerObj = PLAYERS.get(player.getUuid());
             if(playerObj.lastPos != null && playerObj.lastPos.equals(player.getPos()) && playerObj.lastRot != null && playerObj.lastRot.equals(player.getCameraEntity().getRotationVector())){
                 playerObj.ticksAfk+=20;
-                if(playerObj.ticksAfk > 5*20 && !playerObj.isAfk){
+                if(playerObj.ticksAfk > 20*60*CONFIG.afkTime && !playerObj.isAfk){
                     toggleAfk(player,playerObj);
                 }
 
