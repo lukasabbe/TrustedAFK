@@ -42,7 +42,19 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
                             PlayerObj playerObj = PLAYERS.get(player.getUuid());
                             toggleAfk(player,playerObj);
                             return 1;
-                        })));
+                        }).then(CommandManager.literal("enable").executes(c ->{
+                            if(!c.getSource().isExecutedByPlayer()){
+                                c.getSource().sendError(Text.of("only player command"));
+                                return 1;
+                            }
+                            SaveData.getPlayerState(c.getSource().getPlayer()).optIn = true;
+                            c.getSource().sendFeedback(()->Text.literal("You will go in to AFK mode after " + CONFIG.afkTime * 60 + " mins"), false);
+                            return 1;
+                        })).then(CommandManager.literal("disable").executes(c ->{
+                            SaveData.getPlayerState(c.getSource().getPlayer()).optIn = true;
+                            c.getSource().sendFeedback(()->Text.literal("You are not going in to AFK mode anymore"), false);
+                            return 1;
+                        }))));
     }
 
 
@@ -66,7 +78,7 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
             PlayerObj playerObj = PLAYERS.get(player.getUuid());
             if(playerObj.lastPos != null && playerObj.lastPos.equals(player.getPos()) && playerObj.lastRot != null && playerObj.lastRot.equals(player.getCameraEntity().getRotationVector())){
                 playerObj.ticksAfk+=20;
-                if(playerObj.ticksAfk > 5*20 && !playerObj.isAfk){
+                if(playerObj.ticksAfk > 60 * 20 * CONFIG.afkTime && !playerObj.isAfk){
                     toggleAfk(player,playerObj);
                 }
 
@@ -80,6 +92,7 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
         });
     }
     public void toggleAfk(ServerPlayerEntity player, PlayerObj playerObj){
+        if(!SaveData.getPlayerState(player).optIn) return;
         playerObj.isAfk = !playerObj.isAfk;
         if(playerObj.isAfk){
             if(player.getScoreboardTeam() != null)
@@ -94,12 +107,15 @@ public class Trustedafk implements ModInitializer, ServerTickEvents.EndTick, Ser
 
     @Override
     public void onPlayReady(ServerPlayNetworkHandler serverPlayNetworkHandler, PacketSender packetSender, MinecraftServer minecraftServer) {
-        PLAYERS.put(serverPlayNetworkHandler.player.getUuid(),new PlayerObj(serverPlayNetworkHandler.getPlayer().getUuid()));
+        final PlayerObj value = new PlayerObj(serverPlayNetworkHandler.getPlayer().getUuid());
+        PLAYERS.put(serverPlayNetworkHandler.player.getUuid(), value);
     }
 
     @Override
     public void onPlayDisconnect(ServerPlayNetworkHandler serverPlayNetworkHandler, MinecraftServer minecraftServer) {
-        toggleAfk(serverPlayNetworkHandler.player, PLAYERS.get(serverPlayNetworkHandler.getPlayer().getUuid()));
+        final PlayerObj playerObj = PLAYERS.get(serverPlayNetworkHandler.getPlayer().getUuid());
+        if(playerObj.isAfk)
+            toggleAfk(serverPlayNetworkHandler.player, playerObj);
         PLAYERS.remove(serverPlayNetworkHandler.player.getUuid());
     }
 

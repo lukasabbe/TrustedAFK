@@ -1,1 +1,2 @@
 afk-time: 10 #the time it takes for player to go in to afk mode in min.
+opt-in-default: false

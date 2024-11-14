@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class Config {
     public int afkTime = 5;
+    public boolean optInDefault = false;
     public void loadConfig() {
         Path configPath = FabricLoader.getInstance().getConfigDir().resolve("trusted-afk-mod-config.yml");
         if(!Files.exists(configPath))createConfig(configPath);
@@ -20,6 +21,9 @@ public class Config {
             Map<String, Object> configMap = yaml.load(new FileReader(configPath.toFile()));
             if(configMap.containsKey("afk-time")){
                 afkTime = (int) configMap.get("afk-time");
+            }
+            if(configMap.containsKey("opt-in-default")){
+                optInDefault = (boolean) configMap.get("opt-in-default");
             }
 
         } catch (FileNotFoundException e) {
